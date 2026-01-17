@@ -446,7 +446,7 @@ export const armenianSites = [
     lng: 44.6517,
     category: "Historical",
     province: "Kotayk",
-    description: "A massive medieval fortress perched on top of a cliff overlooking the Hrazdan river.",
+    description: "A massive, beautiful medieval fortress perched on top of a cliff overlooking the Hrazdan river.",
     image: "https://happyholidays.am/wp-content/uploads/2025/10/bjni-fortress.webp"
   },
   {
@@ -456,7 +456,7 @@ export const armenianSites = [
     lng: 44.3814,
     category: "Statue",
     province: "Aragatsotn",
-    description: "Giant stone carvings of the 39 letters of the Armenian alphabet.",
+    description: "Giant Stone carvings of the 39 letters of the Armenian alphabet.",
     image: "https://www.eltravelclub.am/media/k2/galleries/226/letter_park_armenia_1.jpg"
   }
 ];
