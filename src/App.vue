@@ -1,6 +1,9 @@
 <template>
   <header>
     <h1 style="font-style: italic">ArMap</h1>
+    <nav>
+      <DarkModeSelector />
+    </nav>
   </header>
 
   <div ref="mapRef" class="map"></div>
@@ -39,6 +42,8 @@
 <script setup>
 import { MapIcon } from "@heroicons/vue/24/solid";
 
+import DarkModeSelector from "./DarkModeSelector.vue";
+
 import { ref, onMounted } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -67,6 +72,9 @@ onMounted(() => {
 
   L.tileLayer(
     "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    {
+      className: "map-tiles",
+    },
   ).addTo(map);
 
   const clusters = L.markerClusterGroup({
@@ -121,6 +129,22 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
+body {
+  --background-color: #fefefe;
+  --text-color: #1c1c1e;
+  --background-color-lighter: #ffffff;
+
+  --header-color: rgba(255, 255, 255, 0.7);
+}
+
+body.dark {
+  --background-color: #1c1c1e;
+  --text-color: #fefefe;
+  --background-color-lighter: #2c2c2e;
+
+  --header-color: rgba(28, 28, 30, 0.7);
+}
+
 body,
 html,
 #app {
@@ -129,20 +153,28 @@ html,
   height: 100%;
   font-family: "Google Sans", sans-serif;
   overflow: hidden;
+
+  background: var(--background-color);
+
+  color: var(--text-color);
+
+  transition: 0.3s;
 }
 
 header {
   width: 100%;
   height: 60px;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   position: absolute;
   top: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--header-color);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  transition: inherit;
 }
 
 .map {
@@ -227,13 +259,15 @@ header {
   bottom: 20px;
   left: 15px;
   right: 15px;
-  background: white;
+  background: var(--background-color-lighter);
   z-index: 2000;
   border-radius: 28px;
   padding: 20px;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
   max-width: 500px;
   margin: 0 auto;
+
+  transition: inherit;
 }
 
 .card-image-container {
@@ -277,13 +311,15 @@ header {
   display: flex;
   gap: 10px;
   margin: 15px 0;
+  transition: inherit;
 }
 .stat-item {
-  background: #f5f5f7;
+  background: var(--background-color);
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: bold;
+  transition: inherit;
 }
 
 .action-btn {
@@ -292,7 +328,7 @@ header {
   color: white;
   border: none;
   padding: 14px;
-  border-radius: 18px;
+  border-radius: 5px;
   font-weight: bold;
   font-size: 16px;
   transition: transform 0.2s;
@@ -308,6 +344,13 @@ header {
 }
 .action-btn:active {
   transform: scale(0.98);
+}
+
+.action-btn-inline {
+  width: auto;
+  padding: 10px 12px;
+  font-size: 14px;
+  margin: 10px;
 }
 
 .close-btn {
@@ -334,6 +377,22 @@ header {
 }
 
 .inline-icon {
-  height: 25px;
+  height: 20px;
+  color: var(--text-color);
+
+  transition: inherit;
+}
+
+.map-tiles {
+  transition: filter 0.3s;
+}
+
+body.dark .map-tiles {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3)
+    brightness(0.7);
+}
+
+.leaflet-container {
+  background: var(--background-color);
 }
 </style>
