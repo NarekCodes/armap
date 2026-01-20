@@ -24,13 +24,21 @@
           <div class="stat-item">🇦🇲 Heritage Site</div>
         </div>
 
-        <button class="action-btn">Open Gallery</button>
+        <a
+          class="action-btn"
+          target="_blank"
+          :href="`https://www.google.com/maps/dir/?api=1&destination=${selectedPoint.lat},${selectedPoint.lng}`"
+        >
+          <MapIcon class="inline-icon" /> Open in Google Maps
+        </a>
       </div>
     </div>
   </Transition>
 </template>
 
 <script setup>
+import { MapIcon } from "@heroicons/vue/24/solid";
+
 import { ref, onMounted } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -106,6 +114,12 @@ onMounted(() => {
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body,
 html,
@@ -282,6 +296,15 @@ header {
   font-weight: bold;
   font-size: 16px;
   transition: transform 0.2s;
+
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+
+  cursor: pointer;
+
+  text-decoration: none;
 }
 .action-btn:active {
   transform: scale(0.98);
@@ -308,5 +331,9 @@ header {
 .slide-up-leave-to {
   transform: translateY(110%);
   opacity: 0;
+}
+
+.inline-icon {
+  height: 25px;
 }
 </style>
