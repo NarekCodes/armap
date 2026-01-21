@@ -17,9 +17,9 @@ ArMap is a mobile/web application designed to help users explore the cultural he
 
 ## 📸 Screenshots
 
-| Home Screen | Place Details | Map Integration |
+| Main List | Place Info | Navigation |
 | :---: | :---: | :---: |
-| <img src="https://via.placeholder.com/200x400?text=App+Home" width="200" /> | <img src="https://via.placeholder.com/200x400?text=Details+View" width="200" /> | <img src="https://via.placeholder.com/200x400?text=Google+Maps" width="200" /> |
+| <img src="./screenshots/list-view.png" width="200" alt="Main List" /> | <img src="./screenshots/details-view.png" width="200" alt="Place Details" /> | <img src="./screenshots/maps-view.png" width="200" alt="Google Maps" /> |
 
 ---
 
