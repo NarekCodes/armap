@@ -7,6 +7,13 @@
   </header>
 
   <div ref="mapRef" class="map"></div>
+  <p class="bottom-text">
+    Map Data &copy;
+    <a href="https://www.openstreetmap.org/copyright" target="_blank">
+      OpenStreetMap contributors
+    </a>
+    &copy; <a href="https://carto.com/" target="_blank">CARTO</a>
+  </p>
 
   <Transition name="slide-up">
     <div v-if="selectedPoint" class="story-card">
@@ -130,7 +137,7 @@ const close = () => {
   mapRef.value.classList.remove("focused");
 };
 </script>
+
 <style>
-  /* Reference the relative path to your new file */
   @import "./assets/style.css";
 </style>
