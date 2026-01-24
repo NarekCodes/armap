@@ -29,6 +29,7 @@
 
   <div ref="mapRef" class="map"></div>
 
+
   <Transition name="slide-up">
     <div v-if="selectedPoint" class="story-card">
       <button @click="close" class="close-btn">✕</button>
@@ -147,7 +148,6 @@ const close = () => {
   mapRef.value.classList.remove("focused");
 };
 </script>
-
 <style>
 @import "./assets/style.css";
 
