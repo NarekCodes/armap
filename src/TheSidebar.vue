@@ -33,45 +33,17 @@
             <h2>Join ArMap</h2>
             <p>Login to save your heritage discoveries and earn XP.</p>
           </div>
-
-          <input
-            v-model="email"
-            type="email"
-            placeholder="Email"
-            class="auth-input"
-            :disabled="isLoading"
-          />
-          <input
-            v-model="password"
-            type="password"
-            placeholder="Password"
-            class="auth-input"
-            :disabled="isLoading"
-          />
-
+          <input v-model="email" type="email" placeholder="Email" class="auth-input" :disabled="isLoading" />
+          <input v-model="password" type="password" placeholder="Password" class="auth-input" :disabled="isLoading" />
           <button @click="handleLogin" class="auth-btn" :disabled="isLoading">
             {{ isLoading ? "Logging in..." : "Login" }}
           </button>
-
-          <button
-            @click="handleRegister"
-            class="auth-btn secondary-style"
-            :disabled="isLoading"
-          >
+          <button @click="handleRegister" class="auth-btn secondary-style" :disabled="isLoading">
             Create Account
           </button>
-
-          <div class="or-divider"><span>OR</span></div>
-
-          <button
-            @click="handleGoogleLogin"
-            class="google-btn"
-            :disabled="isLoading"
-          >
-            <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              width="18"
-            />
+          <div class="or-divider"><span>OR</span></div>  
+          <button @click="handleGoogleLogin" class="google-btn" :disabled="isLoading">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" />
             Sign in with Google
           </button>
         </div>
@@ -93,8 +65,6 @@
             </div>
           </div>
 
-          <div class="divider"></div>
-
           <div class="stats-grid">
             <div class="stat-card">
               <span class="stat-value">🏆 {{ userXP }}</span>
@@ -102,33 +72,35 @@
             </div>
             <div class="stat-card">
               <span class="stat-value">📍 {{ visitedCount }}</span>
-              <span class="stat-label">Sites Visited</span>
+              <span class="stat-label">Visited</span>
             </div>
-            <div class="stat-card full-width">
-              <div class="rank-container">
-                <span class="stat-label">Rank</span>
-                <span class="rank-name">🇦🇲 Lvl 1 Explorer</span>
+          </div>
+
+          <div class="leaderboard-section">
+            <h3 class="section-title">Global Leaderboard</h3>
+            <div class="leaderboard-list">
+              <div 
+                v-for="(player, index) in topTen" 
+                :key="player.uid" 
+                :class="['leader-item', { 'is-me': player.uid === user.uid }]"
+              >
+                <span class="rank">#{{ index + 1 }}</span>
+                <span class="name">{{ player.displayName }}</span>
+                <span class="xp">{{ player.xp }} XP</span>
               </div>
+
+              <template v-if="userRank > 10">
+                <div class="leader-divider">•••</div>
+                <div class="leader-item is-me">
+                  <span class="rank">#{{ userRank }}</span>
+                  <span class="name">You</span>
+                  <span class="xp">{{ userXP }} XP</span>
+                </div>
+              </template>
             </div>
           </div>
 
           <button @click="handleLogout" class="logout-btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
-              />
-            </svg>
             Logout
           </button>
         </div>
@@ -140,33 +112,55 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { auth } from "./firebase";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
+import { ref, onMounted, computed } from 'vue';
+import { auth, db } from './firebase'; 
+import { ref as dbRef, onValue } from "firebase/database";
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
 
-defineProps(["isOpen"]);
-const emit = defineEmits(["close"]);
+const props = defineProps({
+  isOpen: Boolean,
+  userXP: Number,
+  visitedCount: Number,
+  user: Object
+});
 
-const email = ref("");
-const password = ref("");
-const user = ref(null);
-const errorMessage = ref("");
+const emit = defineEmits(['close']);
+
+const email = ref('');
+const password = ref('');
+const errorMessage = ref('');
 const isLoading = ref(false);
+const allUsers = ref([]);
 
-const userXP = ref(50);
-const visitedCount = ref(0);
-
+// Fetch all users to calculate ranks
 onMounted(() => {
-  onAuthStateChanged(auth, (currentUser) => {
-    user.value = currentUser;
+  const usersRef = dbRef(db, 'users');
+  onValue(usersRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      // Convert object to array and sort by XP
+      const list = Object.entries(data).map(([uid, values]) => ({
+        uid,
+        displayName: values.displayName || values.email.split('@')[0],
+        xp: values.xp || 0
+      }));
+      allUsers.value = list.sort((a, b) => b.xp - a.xp);
+    }
   });
+});
+
+const topTen = computed(() => allUsers.value.slice(0, 10));
+
+const userRank = computed(() => {
+  if (!props.user) return 0;
+  return allUsers.value.findIndex(u => u.uid === props.user.uid) + 1;
 });
 
 const handleLogin = async () => {
@@ -208,8 +202,9 @@ const handleGoogleLogin = async () => {
   try {
     await signInWithPopup(auth, provider);
     errorMessage.value = "";
+    // No need to emit close here, let them see their new profile!
   } catch (err) {
-    errorMessage.value = "Google login failed. Pop-up blocked or cancelled.";
+    errorMessage.value = "Google login failed.";
   }
 };
 
@@ -419,5 +414,87 @@ const handleLogout = () => signOut(auth);
   background: rgba(0, 0, 0, 0.4);
   z-index: 2000;
   backdrop-filter: blur(4px);
+}
+
+/* --- Leaderboard Styles --- */
+.leaderboard-section {
+  margin-top: 25px;
+  background: #f9f9f9;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+}
+
+.section-title {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.leader-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 10px;
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+.leader-item.is-me {
+  border-color: var(--primary-color);
+  background: rgba(53, 108, 184, 0.05);
+}
+
+.rank {
+  font-weight: 800;
+  width: 30px;
+  color: #a1a1aa;
+}
+
+.leader-item.is-me .rank {
+  color: var(--primary-color);
+}
+
+.name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 10px;
+}
+
+.xp {
+  font-weight: 800;
+  color: var(--text-color);
+  font-size: 12px;
+}
+
+.leader-divider {
+  text-align: center;
+  color: #ccc;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+body.dark .leaderboard-section {
+  background: #2c2c2e;
+  border-color: #3a3a3c;
+}
+
+body.dark .leader-item {
+  background: #1c1c1e;
+  color: white;
 }
 </style>
