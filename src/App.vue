@@ -131,6 +131,7 @@ onMounted(() => {
     }
   });
 
+
   navigator.geolocation.watchPosition((position) => {
     userLocation.value = {
       lat: position.coords.latitude,
