@@ -37,3 +37,5 @@ __screenshots__/
 
 # Env files
 .env
+
+.temp/
