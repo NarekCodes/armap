@@ -11,7 +11,7 @@
       <img
         v-if="user"
         :src="
-          user.photoURL ||
+          user.user_metadata.picture ||
           'https://api.dicebear.com/7.x/bottts/svg?seed=' + user.uid
         "
         class="trigger-img"

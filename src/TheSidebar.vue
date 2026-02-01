@@ -79,14 +79,15 @@
           <div class="profile-header">
             <img
               :src="
-                user.photoURL ||
+                user.user_metadata.picture ||
                 'https://api.dicebear.com/7.x/bottts/svg?seed=' + user.uid
               "
               class="profile-avatar"
             />
             <div class="profile-info">
               <h2>
-                Barev, {{ user.displayName || user.email.split("@")[0] }}!
+                Barev,
+                {{ user.user_metadata.name || user.email.split("@")[0] }}!
               </h2>
               <p class="user-email">{{ user.email }}</p>
             </div>
