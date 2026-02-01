@@ -9,7 +9,7 @@
   <button class="profile-trigger" @click="isSidebarOpen = true">
     <div class="avatar-container">
       <img
-        v-if="user"
+        v-if="user && userData"
         :src="
           user.user_metadata.picture ||
           'https://api.dicebear.com/7.x/bottts/svg?seed=' + user.uid
@@ -18,7 +18,9 @@
       />
       <UserIcon v-else class="trigger-img" />
     </div>
-    <span v-if="userData" class="xp-badge"
+    <span
+      v-if="userData && armenianSites && armenianSites.length > 0"
+      class="xp-badge"
       >{{ userData?.xp ?? "No" }} XP ({{
         ((userData.visitedids.length / armenianSites.length) * 100).toFixed(1)
       }}% complete)</span
@@ -110,7 +112,13 @@ import { useDB } from "./useDB";
 import { supabase } from "./supabase";
 
 const { user } = useAuth();
-const { userData, visitLocation, error: dbError, fetchUserData } = useDB();
+const {
+  userData,
+  visitLocation,
+  error: dbError,
+  fetchUserData,
+  loading: dbLoading,
+} = useDB();
 
 const isSidebarOpen = ref(false);
 const mapRef = ref(null);
